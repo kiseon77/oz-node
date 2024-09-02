@@ -7,7 +7,7 @@ const main = document.querySelector("main");
 const userName = document.querySelector("#user_name");
 const userInfo = document.querySelector("#user_info");
 
-axios.default.withCredentials = true;
+axios.defaults.withCredentials = true;
 
 form.addEventListener("submit", (e) => e.preventDefault());
 
@@ -28,10 +28,18 @@ function renderUserInfo(user) {
   userName.textContent = user.user_name;
   userInfo.textContent = user.user_info;
 }
-
+function renderLoginForm(user) {
+  userName.textContent = "";
+  userInfo.textContent = "";
+}
 loginButton.onclick = () => {
   login()
     .then(() => getUserInfo())
     .then((res) => renderUserInfo(res.data));
 };
-logoutButton.onclick = logout;
+logoutButton.onclick = () => {
+  logout().then((res) => {
+    console.log(res);
+    renderLoginForm();
+  });
+};

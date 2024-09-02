@@ -28,33 +28,39 @@ app.use(
     secret: "session secret",
     resave: false,
     saveUninitialized: false,
+    signed: false,
     name: "session_id",
   })
 );
 
 app.post("/", (req, res) => {
   const { userId, userPassword } = req.body;
+  console.log("post", userId, userPassword);
   const userInfo = users.find(
     (el) => el.user_id === userId && userPassword === el.user_password
   );
+  console.log("post userInfo", userInfo);
   if (!userInfo) {
     res.status(401).send("로그인 실패");
   } else {
     req.session.userId = userInfo.user_id;
     res.send("세션 생성 완료!");
-    console.log(userInfo);
   }
 });
 
 app.get("/", (req, res) => {
-  console.log(req.session)
-  const userInfo = users.find((el) => el.user_id === req.session.userId);
+  const userInfo = users.find((el) => {
+    return el.user_id === req.session.userId;
+  });
+
+  console.log("get", userInfo);
   return res.json(userInfo);
 });
 
 app.delete("/", (req, res) => {
-  const userInfo = users.find((el) => el.user_id === req.session.userId);
-  return res.json(userInfo);
+  req.session.destroy()
+  res.clearCookie("session_id")
+  return res.send("세션 삭제 완료!")
 });
 
 app.listen(3000, () => console.log("서버 실행"));
